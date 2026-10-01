@@ -5206,6 +5206,11 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, ObjexxFC
         lastZone = ZoneToResimulate;
     }
 
+    // Copy the results of the representative surfaces first, so that the zone window heat gain includes the windows they represent
+    if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+        UpdateNonRepresentativeSurfaceResults(state, ZoneToResimulate);
+    }
+
     for (int zoneNum = firstZone; zoneNum <= lastZone; ++zoneNum) {
         for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
             auto const &thisSpace = state.dataHeatBal->space(spaceNum);
@@ -5227,10 +5232,6 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, ObjexxFC
                     state.dataHeatBal->ZoneWinHeatLossRep(zoneNum) * state.dataGlobal->TimeStepZoneSec;
             }
         }
-    }
-
-    if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
-        UpdateNonRepresentativeSurfaceResults(state, ZoneToResimulate);
     }
 
     // Opaque or window surfaces (Skip TDD:DOME objects. Inside temp is handled by TDD:DIFFUSER.)
@@ -5380,7 +5381,7 @@ void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, ObjexxFCL::Opt
                 int repSurfNum = surface.RepresentativeCalcSurfNum;
 
                 if (surfNum != repSurfNum) {
-                    Real64 areaRatio = surface.Area / state.dataSurface->Surface(surfNum).Area;
+                    Real64 areaRatio = surface.Area / state.dataSurface->Surface(repSurfNum).Area;
 
                     // Glazing
                     state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) =
@@ -5411,10 +5412,11 @@ void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, ObjexxFCL::Opt
 
                     state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum) = frameHeatGain + dividerHeatGain;
 
-                    // Whole window
-                    state.dataSurface->SurfWinHeatGain(surfNum) = (state.dataSurface->SurfWinHeatGain(repSurfNum) -
-                                                                   state.dataSurface->SurfWinGainFrameDividerToZoneRep(repSurfNum) * areaRatio) +
-                                                                  state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum);
+                    // Whole window: glazing part scaled by the glazed area, plus this window's own frame and divider part
+                    state.dataSurface->SurfWinHeatGain(surfNum) =
+                        (state.dataSurface->SurfWinHeatGain(repSurfNum) - state.dataSurface->SurfWinGainFrameDividerToZoneRep(repSurfNum)) *
+                            areaRatio +
+                        state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum);
                 }
             }
         }
@@ -7207,7 +7209,7 @@ void ReportNonRepresentativeSurfaceResults(EnergyPlusData &state)
                     auto const &surface = state.dataSurface->Surface(surfNum);
                     int repSurfNum = surface.RepresentativeCalcSurfNum;
                     if (surfNum != repSurfNum) {
-                        Real64 areaRatio = surface.Area / state.dataSurface->Surface(surfNum).Area;
+                        Real64 areaRatio = surface.Area / state.dataSurface->Surface(repSurfNum).Area;
                         state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) =
                             state.dataSurface->SurfWinGainConvGlazToZoneRep(repSurfNum) * areaRatio;
                         state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) =
