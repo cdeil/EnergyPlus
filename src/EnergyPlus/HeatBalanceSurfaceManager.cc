@@ -2819,6 +2819,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum) = 0.0;
                 state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum) = 0.0;
                 state.dataSurface->SurfWinDividerHeatGain(SurfNum) = 0.0;
+                state.dataSurface->SurfWinDividerHeatLoss(SurfNum) = 0.0;
             }
 
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {

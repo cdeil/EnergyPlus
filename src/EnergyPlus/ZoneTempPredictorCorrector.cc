@@ -5378,7 +5378,7 @@ SumHATOutput SpaceHeatBalanceData::calcSumHAT(EnergyPlusData &state, int const z
                 // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
                 // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
                 // at the same time that the interaction between glass and shade is calculated.
-                results.sumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
+                results.sumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum) - state.dataSurface->SurfWinDividerHeatLoss(SurfNum);
             }
 
             // Other convection term is applicable to equivalent layer window (ASHWAT) model
@@ -5631,7 +5631,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
                     // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
                     // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
                     // at the same time that the interaction between glass and shade is calculated.
-                    thisAirRpt.SumIntGains += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
+                    thisAirRpt.SumIntGains += state.dataSurface->SurfWinDividerHeatGain(SurfNum) - state.dataSurface->SurfWinDividerHeatLoss(SurfNum);
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model

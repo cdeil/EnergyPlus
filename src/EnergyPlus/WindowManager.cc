@@ -5755,13 +5755,8 @@ namespace Window {
             }
             s_surf->SurfWinHeatGain(SurfNum) += DividerHeatGain;
             s_surf->SurfWinGainFrameDividerToZoneRep(SurfNum) += DividerHeatGain;
-            // If interior shade is present it is assumed that both the convective and IR radiative gain
-            // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
-            // interaction between divider and shade is ignored due to the difficulty of calculating this interaction
-            // at the same time that the interaction between glass and shade is calculated.
-            if (ANY_INTERIOR_SHADE_BLIND(s_surf->SurfWinShadingFlag(SurfNum))) {
-                s_surf->SurfWinDividerHeatGain(SurfNum) = DividerHeatGain;
-            }
+            // With an interior shade or blind the zone air heat balance takes the divider's heat gain minus its heat loss
+            // directly as a convective gain (see SpaceHeatBalanceData::calcSumHAT).
             // DivTempOut = s_surf->SurfWinDividerTempSurfOut(SurfNum) + Constant::Kelvin;
         } // End of check if window has dividers
     } // CalcWinFrameAndDividerTemps()

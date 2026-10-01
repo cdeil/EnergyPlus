@@ -851,7 +851,7 @@ namespace RoomAir {
                     if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                         // The shade area covers the area of the glazing plus the area of the dividers.
                         Area += state.dataSurface->SurfWinDividerArea(SurfNum);
-                        SumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
+                        SumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum) - state.dataSurface->SurfWinDividerHeatLoss(SurfNum);
                     }
 
                     // Convective heat gain from natural convection in gap between glass and interior shade or blind
